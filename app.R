@@ -15,13 +15,24 @@ library(DT)
 uicData <- read.csv(file = "UIC_Data.csv", header = TRUE)
 
 #Re-format date field
-library(lubridate)
 uicData$newDate <- mdy(uicData$date)
 uicData$date <- NULL
 
 # Add up entries at UIC-Halsted for each year 
 byYearUIC <- setNames(aggregate(uicData$rides, by=list(format(uicData$newDate, "%Y")), sum), c("Year", "Entries"))
 
+#read in O'Hare data
+ohareData <- read.csv(file = "Ohare_Data.csv", header = TRUE)
+
+#Re-format date field
+ohareData$newDate <- mdy(ohareData$date)
+ohareData$date <- NULL
+
+# Add up entries at UIC-Halsted for each year 
+byYearOhare <- setNames(aggregate(ohareData$rides, by=list(format(ohareData$newDate, "%Y")), sum), c("Year", "Entries"))
+
+
+#For year input
 years <- c(2001:2021)
 
 # Define UI for application dashboard
@@ -35,12 +46,23 @@ ui <- dashboardPage(
                      menuItem("", tabName = "cheapBlankSpace", icon = NULL),
                      menuItem("", tabName = "cheapBlankSpace", icon = NULL),
                      menuItem("", tabName = "cheapBlankSpace", icon = NULL),
-                     menuItem("", tabName = "cheapBlankSpace", icon = NULL)),
+                     menuItem("", tabName = "cheapBlankSpace", icon = NULL),
+                     menuItem("", tabName = "cheapBlankSpace", icon = NULL),
+                     menuItem("", tabName = "cheapBlankSpace", icon = NULL),
+                     menuItem("About", tabName = "About", icon = NULL),
+                     menuItem("Data Visualizations", tabName = "Datavisualizations", icon = NULL)),
                    
-                   selectInput("Year", "Select the year to visualize", years, selected = 2021),
+                   selectInput("Year", "Select the year to visualize for UIC-Halsted", years, selected = 2021),
                    selectInput("Display", "View Charts or Tables", c("Charts","Tables"), selected = "Charts")
   ),
   dashboardBody(
+    tabItems(
+      tabItem(tabName = "About",
+              h1("CTA Ridership Project"),
+              h2("Data From: Chicago Data Portal at https://data.cityofchicago.org/Transportation/CTA-Ridership-L-Station-Entries-Daily-Totals/5neh-572f"),
+              h2("Application Written by Rafiya Awan for CS 424")
+      ),
+      tabItem(tabName = "Datavisualizations",
     conditionalPanel(
       condition = "input.Display == 'Charts'",
     fluidRow(
@@ -110,7 +132,8 @@ ui <- dashboardPage(
              )
       )
       
-    ))
+    )))
+  )
   )
 )
 
